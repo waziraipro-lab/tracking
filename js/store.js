@@ -6,8 +6,13 @@ const WazirStore = (() => {
   const supabaseKey = 'sb_publishable_Skq8e-reB7Ym6L-dI5Z53Q_1MT0ekyA';
   
   // Google Sheets Sync Configuration
-  let googleSheetUrl = localStorage.getItem('wazir_google_sheet_url') || 'https://script.google.com/macros/s/AKfycby1kEgm7p-KB7n6XPFT4IlMzFykqAOUR_xTojB6maeZNH_PK_C4nnAuFQ5B8reDPtnSNw/exec';
-  let usingGoogleSheet = !!googleSheetUrl;
+  const DEFAULT_GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby1kEgm7p-KB7n6XPFT4IlMzFykqAOUR_xTojB6maeZNH_PK_C4nnAuFQ5B8reDPtnSNw/exec';
+  let googleSheetUrl = localStorage.getItem('wazir_google_sheet_url');
+  if (!googleSheetUrl || !googleSheetUrl.trim()) {
+    googleSheetUrl = DEFAULT_GOOGLE_SHEET_URL;
+    localStorage.setItem('wazir_google_sheet_url', googleSheetUrl);
+  }
+  let usingGoogleSheet = true;
 
   const setGoogleSheetUrl = (url) => {
     googleSheetUrl = url ? url.trim() : '';
