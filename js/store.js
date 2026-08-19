@@ -148,24 +148,18 @@ const WazirStore = (() => {
         syncLocal('email_logs', emailLogs);
       }
 
-      // Merge Cloud Attendance with Local Attendance (Never overwrite local data with defaults if local has recorded entries!)
+      // Merge Cloud Attendance with Local Attendance (Cloud data ALWAYS takes 100% precedence over stale local cache!)
       if (attRes.data && attRes.data.length > 0) {
-        // Merge Supabase entries with local entries (local recorded entries take precedence if absent in cloud)
         const mergedAttMap = new Map();
+        // 1. Put local cache first
+        (attendance || []).forEach(a => mergedAttMap.set(`${a.juniorId}_${a.date}`, a));
+        // 2. Overwrite with fresh Supabase Cloud data!
         attRes.data.forEach(a => mergedAttMap.set(`${a.juniorId}_${a.date}`, a));
-        attendance.forEach(a => {
-          const key = `${a.juniorId}_${a.date}`;
-          if (!mergedAttMap.has(key)) {
-            mergedAttMap.set(key, a);
-          }
-        });
+
         attendance = Array.from(mergedAttMap.values());
         syncLocal('attendance', attendance);
-        
-        // Push any missing local attendance to Supabase
-        await supabase.from('attendance').upsert(attendance).catch(e => console.warn("Attendance upsert sync warning:", e.message));
       } else if (attendance.length > 0) {
-        // If Supabase attendance table is empty, upload all local attendance records
+        // If Supabase attendance table is empty, upload initial local attendance records
         await supabase.from('attendance').upsert(attendance).catch(e => console.warn("Attendance auto-seed error:", e.message));
       }
 
