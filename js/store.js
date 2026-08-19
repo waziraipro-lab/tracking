@@ -6,7 +6,7 @@ const WazirStore = (() => {
   const supabaseKey = 'sb_publishable_Skq8e-reB7Ym6L-dI5Z53Q_1MT0ekyA';
   
   // Google Sheets Sync Configuration
-  let googleSheetUrl = localStorage.getItem('wazir_google_sheet_url') || '';
+  let googleSheetUrl = localStorage.getItem('wazir_google_sheet_url') || 'https://script.google.com/macros/s/AKfycby1kEgm7p-KB7n6XPFT4IlMzFykqAOUR_xTojB6maeZNH_PK_C4nnAuFQ5B8reDPtnSNw/exec';
   let usingGoogleSheet = !!googleSheetUrl;
 
   const setGoogleSheetUrl = (url) => {
