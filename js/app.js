@@ -261,7 +261,8 @@ const WazirApp = (() => {
     // Check password if switching to Wazir Senior view
     if (userId === 'admin_senior') {
       const password = prompt("Enter Wazir Senior password to access Admin panel:");
-      if (password !== 'STWazir8') {
+      const cleanPwd = (password || '').trim();
+      if (cleanPwd.toLowerCase() !== 'stwazir8') {
         showToast("Access Denied: Incorrect password.", "danger");
         // Revert dropdown selection to previous user
         document.getElementById('user-role-select').value = currentUser.id;
@@ -1567,19 +1568,18 @@ const WazirApp = (() => {
     const currentRole = WazirStore.getActiveRole();
     if (currentRole === 'junior') {
       const password = prompt("Enter Senior password to switch workspace:");
-      if (password === 'STWazir8') {
+      const cleanPwd = (password || '').trim();
+      if (cleanPwd.toLowerCase() === 'stwazir8') {
         WazirStore.logIn('admin');
-        showToast("Switched to Senior Workspace.", "success");
         window.location.hash = '#/admin-overview';
         updateThemeClass();
         handleRouting();
       } else if (password !== null) {
-        showToast("Incorrect password. Access denied.", "danger");
+        alert("Incorrect password. Access denied.");
       }
     } else {
       const juniorId = WazirStore.getSelectedJuniorId() || 'junior_animesh';
       WazirStore.logIn('junior', juniorId);
-      showToast("Switched to Junior Workspace.", "success");
       window.location.hash = '#/dashboard';
       updateThemeClass();
       handleRouting();
@@ -1593,13 +1593,13 @@ const WazirApp = (() => {
     if (role === 'admin') {
       const passwordInput = document.getElementById('login-password-input');
       const password = passwordInput ? passwordInput.value : '';
-      if (password === 'STWazir8') {
+      const cleanPwd = (password || '').trim();
+      if (cleanPwd.toLowerCase() === 'stwazir8') {
         if (passwordInput) passwordInput.value = '';
         WazirStore.logIn('admin');
-        showToast("Logged in as Wazir Senior.", "success");
         window.location.hash = '#/admin-overview';
       } else {
-        showToast("Incorrect password. Access denied.", "danger");
+        alert("Incorrect password. Access denied.");
       }
     } else {
       const juniorId = WazirStore.getSelectedJuniorId() || 'junior_animesh';

@@ -1465,11 +1465,12 @@ body.theme-admin .email-header-banner {
 }
 
 /* Toast Messages */
-.toast-container {
+.toast-container, .toast {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
-
-.toast {
   background-color: var(--bg-card);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
