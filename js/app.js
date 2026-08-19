@@ -1699,9 +1699,9 @@ const WazirApp = (() => {
         <td>${checkInLabel}</td>
         <td style="text-align: right;">
           <div style="display: flex; gap: 4px; justify-content: flex-end;">
-            <button class="btn btn-secondary btn-sm" onclick="WazirApp.markAttendanceFromJuniorView('${j.id}', 'Present')">Present</button>
-            <button class="btn btn-secondary btn-sm" onclick="WazirApp.markAttendanceFromJuniorView('${j.id}', 'Late')">Late</button>
-            <button class="btn btn-danger btn-sm" onclick="WazirApp.markAttendanceFromJuniorView('${j.id}', 'Absent')">Absent</button>
+            <button class="btn ${logStatus === 'Present' ? 'btn-success' : 'btn-secondary'} btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromJuniorView('${j.id}', 'Present')">Present</button>
+            <button class="btn ${logStatus === 'Late' ? 'btn-warning' : 'btn-secondary'} btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromJuniorView('${j.id}', 'Late')">Late</button>
+            <button class="btn ${logStatus === 'Absent' ? 'btn-danger' : 'btn-secondary'} btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromJuniorView('${j.id}', 'Absent')">Absent</button>
           </div>
         </td>
       `;
@@ -1914,9 +1914,9 @@ const WazirApp = (() => {
         <td><span class="badge ${badgeClass}" style="font-size:0.75rem; padding: 2px 6px;">${logStatus}</span></td>
         <td style="text-align: right;">
           <div style="display: flex; gap: 4px; justify-content: flex-end;">
-            <button class="btn btn-secondary btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromEditDialog('${j.id}', 'Present')">Present</button>
-            <button class="btn btn-secondary btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromEditDialog('${j.id}', 'Late')">Late</button>
-            <button class="btn btn-danger btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromEditDialog('${j.id}', 'Absent')">Absent</button>
+            <button class="btn ${logStatus === 'Present' ? 'btn-success' : 'btn-secondary'} btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromEditDialog('${j.id}', 'Present')">Present</button>
+            <button class="btn ${logStatus === 'Late' ? 'btn-warning' : 'btn-secondary'} btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromEditDialog('${j.id}', 'Late')">Late</button>
+            <button class="btn ${logStatus === 'Absent' ? 'btn-danger' : 'btn-secondary'} btn-sm" style="font-size:0.7rem; padding: 4px 8px;" onclick="WazirApp.markAttendanceFromEditDialog('${j.id}', 'Absent')">Absent</button>
           </div>
         </td>
       `;
