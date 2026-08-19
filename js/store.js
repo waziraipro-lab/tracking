@@ -265,75 +265,48 @@ const WazirStore = (() => {
     isPollingActive = true;
 
     setInterval(async () => {
-      if (!usingSupabase || !supabase) return;
+      if (!supabase) return;
 
       try {
-        // 1. Fast Real-Time Poll for Attendance Table
+        // 1. Unconditional Real-Time Sync for Attendance Table
         const { data: latestAtt, error: attErr } = await supabase.from('attendance').select('*');
-        if (!attErr && latestAtt) {
-          let hasAttChanged = latestAtt.length !== attendance.length;
-          if (!hasAttChanged) {
-            for (const item of latestAtt) {
-              const match = attendance.find(a => a.id === item.id || (a.juniorId === item.juniorId && a.date === item.date));
-              if (!match || match.status !== item.status || match.checkInTime !== item.checkInTime) {
-                hasAttChanged = true;
-                break;
-              }
-            }
-          }
-          if (hasAttChanged) {
-            console.log("⚡ Real-time Sync: Remote attendance update detected!");
+        if (!attErr && latestAtt && latestAtt.length > 0) {
+          const isDifferent = JSON.stringify(latestAtt) !== JSON.stringify(attendance);
+          if (isDifferent) {
+            console.log("⚡ Real-time Sync: Live attendance update received from Supabase Cloud.");
             attendance = latestAtt;
             syncLocal('attendance', attendance);
             triggerUIRefresh();
           }
         }
 
-        // 2. Fast Real-Time Poll for Tasks Table
+        // 2. Unconditional Real-Time Sync for Tasks Table
         const { data: latestTasks, error: taskErr } = await supabase.from('tasks').select('*');
         if (!taskErr && latestTasks) {
-          let hasTasksChanged = latestTasks.length !== tasks.length;
-          if (!hasTasksChanged) {
-            for (const item of latestTasks) {
-              const match = tasks.find(t => t.id === item.id);
-              if (!match || match.status !== item.status || match.deadline !== item.deadline || JSON.stringify(match.history) !== JSON.stringify(item.history)) {
-                hasTasksChanged = true;
-                break;
-              }
-            }
-          }
-          if (hasTasksChanged) {
-            console.log("⚡ Real-time Sync: Remote task update detected!");
+          const isDifferent = JSON.stringify(latestTasks) !== JSON.stringify(tasks);
+          if (isDifferent) {
+            console.log("⚡ Real-time Sync: Live tasks update received from Supabase Cloud.");
             tasks = latestTasks;
             syncLocal('tasks', tasks);
             triggerUIRefresh();
           }
         }
 
-        // 3. Fast Real-Time Poll for Requests Table
+        // 3. Unconditional Real-Time Sync for Requests Table
         const { data: latestReqs, error: reqErr } = await supabase.from('requests').select('*');
         if (!reqErr && latestReqs) {
-          let hasReqsChanged = latestReqs.length !== requests.length;
-          if (!hasReqsChanged) {
-            for (const item of latestReqs) {
-              const match = requests.find(r => r.id === item.id);
-              if (!match || match.status !== item.status) {
-                hasReqsChanged = true;
-                break;
-              }
-            }
-          }
-          if (hasReqsChanged) {
-            console.log("⚡ Real-time Sync: Remote request update detected!");
+          const isDifferent = JSON.stringify(latestReqs) !== JSON.stringify(requests);
+          if (isDifferent) {
+            console.log("⚡ Real-time Sync: Live requests update received from Supabase Cloud.");
             requests = latestReqs;
             syncLocal('requests', requests);
             triggerUIRefresh();
           }
         }
       } catch (err) {
-        console.warn("Real-time polling sync error:", err);
+        console.warn("Real-time polling sync warning:", err);
       }
-    }, 1500); // Fast 1.5 second loop for real-time responsiveness
+    }, 1500); // 1.5 second continuous sync loop
   };
 
   // Triggers visual refresh of active view in app.js on database change
