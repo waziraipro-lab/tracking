@@ -1,4 +1,4 @@
-const CACHE_NAME = "wazir-tracker-cache-v1";
+const CACHE_NAME = "wazir-tracker-cache-v2.1";
 const ASSETS = [
   "./index.html",
   "./css/styles.css",
@@ -12,11 +12,6 @@ const ASSETS = [
 
 // Install Event
 self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
   self.skipWaiting();
 });
 
@@ -25,31 +20,22 @@ self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
+        keys.map((key) => caches.delete(key))
       );
     })
   );
   self.clients.claim();
 });
 
-// Fetch Interceptor for Offline Use
+// Network-First Fetch Interceptor (Always load latest deployed JS/CSS when online)
 self.addEventListener("fetch", (e) => {
-  // Let Supabase requests bypass cache
-  if (e.request.url.includes("supabase.co")) {
+  if (e.request.url.includes("supabase")) {
     return;
   }
 
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(e.request).then((networkResponse) => {
-        // Cache static requests dynamically
+    fetch(e.request)
+      .then((networkResponse) => {
         if (networkResponse.status === 200 && e.request.method === "GET") {
           const responseClone = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -57,9 +43,7 @@ self.addEventListener("fetch", (e) => {
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Ignore
-      });
-    })
+      })
+      .catch(() => caches.match(e.request))
   );
 });

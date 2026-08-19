@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Wazir Juniors — Task & Deadline Tracker</title>
-  <link rel="stylesheet" href="css/styles.css?v=1.3">
+  <link rel="stylesheet" href="css/styles.css?v=2.1">
   
   <!-- PWA & Mobile Web App Meta Tags -->
   <link rel="manifest" href="manifest.json">
@@ -1042,16 +1042,21 @@ CREATE POLICY "allow_anon_attendance" ON attendance FOR ALL TO anon USING (true)
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/mockData.js?v=1.6"></script>
-  <script src="js/store.js?v=1.6"></script>
-  <script src="js/emailService.js?v=1.6"></script>
-  <script src="js/app.js?v=1.6"></script>
+  <script src="js/mockData.js?v=2.1"></script>
+  <script src="js/store.js?v=2.1"></script>
+  <script src="js/emailService.js?v=2.1"></script>
+  <script src="js/app.js?v=2.1"></script>
   <script>
     if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let reg of registrations) {
+          reg.update();
+        }
+      });
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('Service Worker registered:', reg.scope))
-          .catch(err => console.error('Service Worker registration failed:', err));
+        navigator.serviceWorker.register('./sw.js?v=2.1')
+          .then(reg => console.log('Service Worker updated:', reg.scope))
+          .catch(err => console.error('Service Worker error:', err));
       });
     }
   </script>
