@@ -5,22 +5,76 @@ const WazirStore = (() => {
   const supabaseUrl = 'https://qctpyulbwjiyvzyhsvfg.supabase.co';
   const supabaseKey = 'sb_publishable_Skq8e-reB7Ym6L-dI5Z53Q_1MT0ekyA';
   
-  let supabase = null;
-  let usingSupabase = false;
+  // Google Sheets Sync Configuration
+  let googleSheetUrl = localStorage.getItem('wazir_google_sheet_url') || '';
+  let usingGoogleSheet = !!googleSheetUrl;
 
-  // Local Cached State Arrays
-  let users = [];
-  let tasks = [];
-  let requests = [];
-  let notifications = [];
-  let emailLogs = [];
-  let attendance = [];
-  
-  // Workspace UI states
-  let activeRole = 'junior'; // 'junior' or 'admin'
-  let selectedJuniorId = 'junior_animesh'; // Active selected junior in Junior view
-  let isLoggedIn = false;
-  let themeMode = 'light';
+  const setGoogleSheetUrl = (url) => {
+    googleSheetUrl = url ? url.trim() : '';
+    localStorage.setItem('wazir_google_sheet_url', googleSheetUrl);
+    if (googleSheetUrl) {
+      usingGoogleSheet = true;
+      syncFromGoogleSheet();
+    }
+  };
+
+  const getGoogleSheetUrl = () => googleSheetUrl;
+
+  const syncToGoogleSheet = async (action, payload) => {
+    if (!googleSheetUrl) return;
+    try {
+      await fetch(googleSheetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action, ...payload })
+      });
+      console.log(`⚡ Google Sheet Sync (${action}): Success`);
+    } catch (e) {
+      console.warn("Google Sheet push sync error:", e);
+    }
+  };
+
+  const syncFromGoogleSheet = async () => {
+    if (!googleSheetUrl) return;
+    try {
+      const res = await fetch(googleSheetUrl + (googleSheetUrl.includes('?') ? '&' : '?') + 'action=all');
+      if (!res.ok) return;
+      const data = await res.json();
+      
+      let changed = false;
+
+      if (data.attendance && Array.isArray(data.attendance) && data.attendance.length > 0) {
+        if (JSON.stringify(data.attendance) !== JSON.stringify(attendance)) {
+          attendance = data.attendance;
+          syncLocal('attendance', attendance);
+          changed = true;
+        }
+      }
+
+      if (data.tasks && Array.isArray(data.tasks)) {
+        if (JSON.stringify(data.tasks) !== JSON.stringify(tasks)) {
+          tasks = data.tasks;
+          syncLocal('tasks', tasks);
+          changed = true;
+        }
+      }
+
+      if (data.requests && Array.isArray(data.requests)) {
+        if (JSON.stringify(data.requests) !== JSON.stringify(requests)) {
+          requests = data.requests;
+          syncLocal('requests', requests);
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        console.log("⚡ Live Google Sheet Sync: Updated data from Google Sheet.");
+        triggerUIRefresh();
+      }
+    } catch (e) {
+      console.warn("Google Sheet pull sync error:", e);
+    }
+  };
 
   // Seeding constants for local fallback
   const DEFAULT_ATTENDANCE = [
@@ -326,6 +380,8 @@ const WazirStore = (() => {
 
   return {
     initSupabase,
+    setGoogleSheetUrl,
+    getGoogleSheetUrl,
     isUsingSupabase() {
       return usingSupabase;
     },
@@ -681,6 +737,9 @@ const WazirStore = (() => {
       syncLocal('attendance', attendance);
       localStorage.setItem('wazir_attendance', JSON.stringify(attendance));
 
+      // Push to Google Sheet if configured
+      syncToGoogleSheet('saveAttendance', { logs: attendance });
+
       // Push to Supabase Cloud if available
       if (usingSupabase && supabase) {
         try {
@@ -720,6 +779,9 @@ const WazirStore = (() => {
 
       syncLocal('attendance', attendance);
       localStorage.setItem('wazir_attendance', JSON.stringify(attendance));
+
+      // Push to Google Sheet if configured
+      syncToGoogleSheet('saveAttendance', { logs: attendance });
 
       if (usingSupabase && supabase) {
         try {

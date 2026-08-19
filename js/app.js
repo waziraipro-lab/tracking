@@ -117,6 +117,11 @@ const WazirApp = (() => {
       darkToggle.checked = WazirStore.getTheme() === 'dark';
     }
 
+    const sheetInput = document.getElementById('settings-google-sheet-url');
+    if (sheetInput) {
+      sheetInput.value = WazirStore.getGoogleSheetUrl();
+    }
+
     updateUserProfileDisplays();
 
     if (activeRole === 'admin') {
@@ -1979,11 +1984,80 @@ const WazirApp = (() => {
     }
   };
 
+  const saveGoogleSheetConfig = () => {
+    const input = document.getElementById('settings-google-sheet-url');
+    if (input) {
+      const url = input.value.trim();
+      WazirStore.setGoogleSheetUrl(url);
+      alert(url ? "Google Sheet URL saved successfully! Live sheet sync activated." : "Google Sheet URL cleared.");
+    }
+  };
+
+  const copyGoogleAppsScriptCode = () => {
+    const code = `function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var result = {};
+  var sheets = ["attendance", "tasks", "requests"];
+  
+  sheets.forEach(function(name) {
+    var sheet = ss.getSheetByName(name);
+    if (!sheet) {
+      sheet = ss.insertSheet(name);
+      if (name === "attendance") sheet.appendRow(["id", "juniorId", "date", "status", "checkInTime"]);
+      if (name === "tasks") sheet.appendRow(["id", "name", "description", "vertical", "priority", "deadline", "assignedBy", "juniorId", "status", "createdAt"]);
+      if (name === "requests") sheet.appendRow(["id", "taskId", "juniorId", "currentDeadline", "requestedDeadline", "reason", "requestedOn", "status"]);
+    }
+    
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    var rows = [];
+    
+    for (var i = 1; i < data.length; i++) {
+      var rowObj = {};
+      for (var j = 0; j < headers.length; j++) {
+        rowObj[headers[j]] = data[i][j];
+      }
+      rows.push(rowObj);
+    }
+    result[name] = rows;
+  });
+  
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var body = JSON.parse(e.postData.contents);
+  var action = body.action;
+  
+  if (action === "saveAttendance") {
+    var sheet = ss.getSheetByName("attendance") || ss.insertSheet("attendance");
+    var logs = body.logs || [];
+    sheet.clear();
+    sheet.appendRow(["id", "juniorId", "date", "status", "checkInTime"]);
+    logs.forEach(function(l) {
+      sheet.appendRow([l.id, l.juniorId, l.date, l.status, l.checkInTime || ""]);
+    });
+    return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({ status: "error" })).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+    navigator.clipboard.writeText(code).then(() => {
+      alert("Google Apps Script code copied to clipboard! Paste it into Google Sheet -> Extensions -> Apps Script -> Deploy as Web App (Anyone).");
+    }).catch(err => {
+      alert("Apps Script Code:\n\n" + code);
+    });
+  };
+
   return {
     init,
     navigate,
     showToast,
     copySupabaseSetupSQL,
+    saveGoogleSheetConfig,
+    copyGoogleAppsScriptCode,
     bulkMarkAttendance,
     bulkMarkAttendanceFromPage,
     switchUser,

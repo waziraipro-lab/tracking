@@ -396,6 +396,24 @@
                 </div>
               </div>
 
+              <!-- Live Google Sheet Integration Box -->
+              <div style="margin-top: 24px; padding: 16px; background-color: var(--bg-app); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; color: var(--text-primary);">
+                  <span>📊</span> Live Google Sheet Integration
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 10px;">
+                  Connect your Google Sheet for 100% real-time attendance and task syncing directly to your spreadsheet:
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 4px;">Google Apps Script Web App URL:</label>
+                  <input type="text" id="settings-google-sheet-url" class="form-control" style="font-size: 0.8rem;" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-primary btn-sm" onclick="WazirApp.saveGoogleSheetConfig()" style="flex: 1; font-size: 0.75rem; padding: 8px;">Save Google Sheet URL</button>
+                  <button class="btn btn-secondary btn-sm" onclick="WazirApp.copyGoogleAppsScriptCode()" style="flex: 1; font-size: 0.75rem; padding: 8px;">📋 Copy Apps Script</button>
+                </div>
+              </div>
+
               <!-- Cloud Sync Diagnostics & SQL Setup Box -->
               <div style="margin-top: 24px; padding: 16px; background-color: var(--bg-app); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
                 <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; color: var(--text-primary);">
