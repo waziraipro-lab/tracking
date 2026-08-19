@@ -165,7 +165,10 @@ const WazirStore = (() => {
 
       console.log("Connected to Supabase Cloud. Active records:", tasks.length, "tasks,", attendance.length, "attendance entries.");
 
-      // Setup Realtime subscriptions and 4-second cross-device polling loop
+      // Trigger visual UI refresh immediately after Cloud data load
+      triggerUIRefresh();
+
+      // Setup Realtime subscriptions and 1.5-second cross-device polling loop
       setupRealtimeSubscriptions();
       startPolling();
 
@@ -271,13 +274,9 @@ const WazirStore = (() => {
         // 1. Unconditional Real-Time Sync for Attendance Table
         const { data: latestAtt, error: attErr } = await supabase.from('attendance').select('*');
         if (!attErr && latestAtt && latestAtt.length > 0) {
-          const isDifferent = JSON.stringify(latestAtt) !== JSON.stringify(attendance);
-          if (isDifferent) {
-            console.log("⚡ Real-time Sync: Live attendance update received from Supabase Cloud.");
-            attendance = latestAtt;
-            syncLocal('attendance', attendance);
-            triggerUIRefresh();
-          }
+          attendance = latestAtt;
+          syncLocal('attendance', attendance);
+          triggerUIRefresh();
         }
 
         // 2. Unconditional Real-Time Sync for Tasks Table
