@@ -23,11 +23,9 @@ const WazirStore = (() => {
   const syncToGoogleSheet = async (action, payload) => {
     if (!googleSheetUrl) return;
     try {
-      await fetch(googleSheetUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action, ...payload })
-      });
+      const payloadStr = encodeURIComponent(JSON.stringify(payload.logs || payload));
+      const targetUrl = `${googleSheetUrl}${googleSheetUrl.includes('?') ? '&' : '?'}action=${action}&payload=${payloadStr}`;
+      await fetch(targetUrl);
       console.log(`⚡ Google Sheet Sync (${action}): Success`);
     } catch (e) {
       console.warn("Google Sheet push sync error:", e);

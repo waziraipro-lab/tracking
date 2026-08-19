@@ -1996,6 +1996,23 @@ const WazirApp = (() => {
   const copyGoogleAppsScriptCode = () => {
     const code = `function doGet(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var action = (e && e.parameter && e.parameter.action) || "read";
+  
+  if (action === "saveAttendance" && e.parameter.payload) {
+    try {
+      var sheet = ss.getSheetByName("attendance") || ss.insertSheet("attendance");
+      var logs = JSON.parse(decodeURIComponent(e.parameter.payload));
+      sheet.clear();
+      sheet.appendRow(["id", "juniorId", "date", "status", "checkInTime"]);
+      logs.forEach(function(l) {
+        sheet.appendRow([l.id, l.juniorId, l.date, l.status, l.checkInTime || ""]);
+      });
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", count: logs.length })).setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  
   var result = {};
   var sheets = ["attendance", "tasks", "requests"];
   
@@ -2023,25 +2040,6 @@ const WazirApp = (() => {
   });
   
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var body = JSON.parse(e.postData.contents);
-  var action = body.action;
-  
-  if (action === "saveAttendance") {
-    var sheet = ss.getSheetByName("attendance") || ss.insertSheet("attendance");
-    var logs = body.logs || [];
-    sheet.clear();
-    sheet.appendRow(["id", "juniorId", "date", "status", "checkInTime"]);
-    logs.forEach(function(l) {
-      sheet.appendRow([l.id, l.juniorId, l.date, l.status, l.checkInTime || ""]);
-    });
-    return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({ status: "error" })).setMimeType(ContentService.MimeType.JSON);
 }`;
 
     navigator.clipboard.writeText(code).then(() => {
