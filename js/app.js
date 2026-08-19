@@ -1631,8 +1631,16 @@ const WazirApp = (() => {
 
   // Removed changeActiveJunior method
 
+  // Local Timezone-Safe Date Formatter (Prevents UTC date shifts near midnight)
+  const getLocalDateStr = (d = new Date()) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Junior Attendance Controllers
-  let juniorAttDate = new Date().toISOString().split('T')[0];
+  let juniorAttDate = getLocalDateStr();
 
   const populateDateSelect = (elementId, selectedValue) => {
     const select = document.getElementById(elementId);
@@ -1647,7 +1655,7 @@ const WazirApp = (() => {
     for (let i = 0; i < 14; i++) {
       const d = new Date();
       d.setDate(now.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = getLocalDateStr(d);
       
       let label = "";
       if (i === 0) label = "Today";
@@ -1726,7 +1734,7 @@ const WazirApp = (() => {
   };
 
   // Admin Attendance Controllers
-  let adminAttDate = new Date().toISOString().split('T')[0];
+  let adminAttDate = getLocalDateStr();
 
   // Admin Attendance Controllers
   let adminAttCalMonth = new Date().getMonth();
@@ -1961,7 +1969,7 @@ const WazirApp = (() => {
   };
 
   const bulkMarkAttendanceFromPage = async (status) => {
-    const targetDate = juniorAttDate || new Date().toISOString().split('T')[0];
+    const targetDate = juniorAttDate || getLocalDateStr();
     try {
       await WazirStore.markBulkAttendance(targetDate, status);
       renderJuniorAttendance();
