@@ -1050,13 +1050,8 @@ CREATE POLICY "allow_anon_attendance" ON attendance FOR ALL TO anon USING (true)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(registrations => {
         for (let reg of registrations) {
-          reg.update();
+          reg.unregister();
         }
-      });
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.1')
-          .then(reg => console.log('Service Worker updated:', reg.scope))
-          .catch(err => console.error('Service Worker error:', err));
       });
     }
   </script>

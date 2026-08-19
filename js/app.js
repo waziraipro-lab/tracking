@@ -1958,6 +1958,8 @@ const WazirApp = (() => {
     } catch (err) {
       showToast(err.message, "danger");
     }
+  };
+
   const bulkMarkAttendanceFromPage = async (status) => {
     const targetDate = juniorAttDate || new Date().toISOString().split('T')[0];
     try {
