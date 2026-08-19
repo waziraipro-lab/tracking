@@ -2025,7 +2025,7 @@ const WazirApp = (() => {
       if (name === "requests") sheet.appendRow(["id", "taskId", "juniorId", "currentDeadline", "requestedDeadline", "reason", "requestedOn", "status"]);
     }
     
-    var data = sheet.getDataRange().getValues();
+    var data = sheet.getDataRange().getDisplayValues();
     var headers = data[0];
     var rows = [];
     

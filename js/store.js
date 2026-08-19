@@ -42,8 +42,22 @@ const WazirStore = (() => {
       let changed = false;
 
       if (data.attendance && Array.isArray(data.attendance) && data.attendance.length > 0) {
-        if (JSON.stringify(data.attendance) !== JSON.stringify(attendance)) {
-          attendance = data.attendance;
+        const cleanedAtt = data.attendance.map(a => {
+          let dateStr = String(a.date || '');
+          if (dateStr.includes('T')) {
+            const d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+              const year = d.getFullYear();
+              const month = String(d.getMonth() + 1).padStart(2, '0');
+              const day = String(d.getDate()).padStart(2, '0');
+              dateStr = `${year}-${month}-${day}`;
+            }
+          }
+          return { ...a, date: dateStr };
+        });
+
+        if (JSON.stringify(cleanedAtt) !== JSON.stringify(attendance)) {
+          attendance = cleanedAtt;
           syncLocal('attendance', attendance);
           changed = true;
         }
