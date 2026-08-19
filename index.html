@@ -328,8 +328,14 @@
 
           <!-- Attendance checklist -->
           <div class="card">
-            <h3>Attendance Checklist</h3>
-            <div style="margin-top: 12px; overflow-x: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <h3 style="margin: 0;">Attendance Checklist</h3>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-success" onclick="WazirApp.bulkMarkAttendanceFromPage('Present')" style="padding: 8px 16px; font-weight: 700; font-size: 0.85rem;">✅ Mark All Present</button>
+                <button class="btn btn-danger" onclick="WazirApp.bulkMarkAttendanceFromPage('Absent')" style="padding: 8px 16px; font-weight: 700; font-size: 0.85rem;">❌ Mark All Absent</button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
               <table class="task-table" style="width: 100%;">
                 <thead>
                   <tr>

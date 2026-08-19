@@ -1958,6 +1958,15 @@ const WazirApp = (() => {
     } catch (err) {
       showToast(err.message, "danger");
     }
+  const bulkMarkAttendanceFromPage = async (status) => {
+    const targetDate = juniorAttDate || new Date().toISOString().split('T')[0];
+    try {
+      await WazirStore.markBulkAttendance(targetDate, status);
+      renderJuniorAttendance();
+      renderAdminAttendance();
+    } catch (err) {
+      alert("Error marking bulk attendance: " + err.message);
+    }
   };
 
   return {
@@ -1966,6 +1975,7 @@ const WazirApp = (() => {
     showToast,
     copySupabaseSetupSQL,
     bulkMarkAttendance,
+    bulkMarkAttendanceFromPage,
     switchUser,
     applyFilters,
     markNotifRead,
