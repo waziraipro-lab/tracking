@@ -1949,11 +1949,23 @@ const WazirApp = (() => {
     }
   };
 
+  const bulkMarkAttendance = async (status) => {
+    if (!activeEditAttendanceDate) return;
+    try {
+      await WazirStore.markBulkAttendance(activeEditAttendanceDate, status);
+      renderEditAttendanceDialogTable();
+      renderAdminAttendance();
+    } catch (err) {
+      showToast(err.message, "danger");
+    }
+  };
+
   return {
     init,
     navigate,
     showToast,
     copySupabaseSetupSQL,
+    bulkMarkAttendance,
     switchUser,
     applyFilters,
     markNotifRead,

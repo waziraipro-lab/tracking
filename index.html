@@ -1000,9 +1000,15 @@ CREATE POLICY "allow_anon_attendance" ON attendance FOR ALL TO anon USING (true)
         <button class="btn btn-secondary btn-circle btn-sm" onclick="WazirApp.closeDialog('admin-attendance-edit-dialog')">✕</button>
       </div>
       
-      <div style="margin-bottom: 16px;">
-        <span style="font-weight: 600; color: var(--text-secondary);">Date:</span>
-        <span id="edit-attendance-dialog-date" style="font-weight: 700; color: var(--text-primary); margin-left: 6px;">18 Aug 2026</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <span style="font-weight: 600; color: var(--text-secondary);">Date:</span>
+          <span id="edit-attendance-dialog-date" style="font-weight: 700; color: var(--text-primary); margin-left: 6px;">18 Aug 2026</span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-success btn-sm" style="font-size:0.75rem; padding:4px 8px;" onclick="WazirApp.bulkMarkAttendance('Present')">✅ Mark All Present</button>
+          <button class="btn btn-danger btn-sm" style="font-size:0.75rem; padding:4px 8px;" onclick="WazirApp.bulkMarkAttendance('Absent')">❌ Mark All Absent</button>
+        </div>
       </div>
 
       <div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">

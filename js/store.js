@@ -690,6 +690,43 @@ const WazirStore = (() => {
       
       return newLog;
     },
+    async markBulkAttendance(dateStr, status) {
+      const juniors = this.getJuniors();
+      const now = new Date().toISOString();
+      const logsToUpsert = juniors.map(j => {
+        const existingIdx = attendance.findIndex(a => a.juniorId === j.id && a.date === dateStr);
+        const logId = existingIdx >= 0 ? attendance[existingIdx].id : `att_${j.id}_${dateStr}`;
+        return {
+          id: logId,
+          juniorId: j.id,
+          date: dateStr,
+          status: status,
+          checkInTime: status === 'Absent' ? null : now
+        };
+      });
+
+      logsToUpsert.forEach(newLog => {
+        const idx = attendance.findIndex(a => a.juniorId === newLog.juniorId && a.date === dateStr);
+        if (idx >= 0) attendance[idx] = newLog;
+        else attendance.push(newLog);
+      });
+
+      syncLocal('attendance', attendance);
+      localStorage.setItem('wazir_attendance', JSON.stringify(attendance));
+
+      if (usingSupabase && supabase) {
+        try {
+          const { error } = await supabase.from('attendance').upsert(logsToUpsert);
+          if (error) console.warn("Bulk attendance upsert warning:", error.message);
+          else console.log("Bulk attendance synced to Supabase Cloud for date:", dateStr);
+        } catch (err) {
+          console.error("Bulk attendance cloud sync error:", err);
+        }
+      }
+
+      triggerUIRefresh();
+      return logsToUpsert;
+    },
 
     // Notifications
     getNotifications(userId) {
