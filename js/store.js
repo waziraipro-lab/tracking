@@ -1,9 +1,9 @@
 // Wazir Juniors - Supabase Cloud Database Store Manager
 
 const WazirStore = (() => {
-  // Supabase Configuration Credentials
-  const supabaseUrl = 'https://qctpyulbwjiyvzyhsvfg.supabase.co';
-  const supabaseKey = 'sb_publishable_Skq8e-reB7Ym6L-dI5Z53Q_1MT0ekyA';
+  // Supabase Configuration Credentials (supports Vercel Integration env variables & static fallback)
+  const supabaseUrl = (typeof window !== 'undefined' && (window.SUPABASE_URL || window.NEXT_PUBLIC_SUPABASE_URL)) || 'https://qctpyulbwjiyvzyhsvfg.supabase.co';
+  const supabaseKey = (typeof window !== 'undefined' && (window.SUPABASE_ANON_KEY || window.NEXT_PUBLIC_SUPABASE_ANON_KEY || window.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)) || 'sb_publishable_Skq8e-reB7Ym6L-dI5Z53Q_1MT0ekyA';
   
   let supabase = null;
   let usingSupabase = false;
